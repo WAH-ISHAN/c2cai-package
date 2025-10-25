@@ -4,9 +4,10 @@ class C2CAIAssistant {
     constructor(config) {
         // Default configuration
         this.config = {
-            backendUrl: 'http://localhost:3000/ask',
+            backendUrl: '/api/ask', // Changed default for production
             language: 'en-US',
             persona: 'general_assistant',
+            welcomeMessage: false, // New option for welcome message
             ...config // User overrides
         };
 
@@ -22,25 +23,34 @@ class C2CAIAssistant {
         
         this.initUI();
         this.initSpeechAPI();
+
+        // Handle welcome message if enabled
+        if (this.config.welcomeMessage) {
+            window.addEventListener('load', () => {
+                setTimeout(() => {
+                    this.greetUser();
+                }, 1000); // 1-second delay
+            });
+        }
     }
 
     initUI() {
-        // Inject CSS
+        // Inject CSS (this part is fine, no changes needed)
         const style = document.createElement('style');
         style.innerHTML = `
-            /* Paste the entire c2cai.css content here */
             #c2cai-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; }
             #c2cai-button { width: 60px; height: 60px; border-radius: 50%; background-color: #007bff; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 8px rgba(0,0,0,0.2); transition: all 0.3s ease; }
             #c2cai-button:hover { transform: scale(1.1); }
             #c2cai-mic-icon { width: 28px; height: 28px; fill: white; }
             #c2cai-button.listening { background-color: #dc3545; animation: pulse 1.5s infinite; }
             #c2cai-button.thinking { background-color: #ffc107; animation: spin 1s linear infinite; }
+            #c2cai-button.speaking { pointer-events: none; } /* Disable button while speaking */
             @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7); } 70% { box-shadow: 0 0 0 20px rgba(220, 53, 69, 0); } 100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); } }
             @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         `;
         document.head.appendChild(style);
 
-        // Create Button
+        // Create Button (this part is fine, no changes needed)
         this.container = document.createElement('div');
         this.container.id = 'c2cai-container';
         
@@ -69,24 +79,34 @@ class C2CAIAssistant {
 
         this.recognition.onend = () => {
             this.isListening = false;
-            if (this.button.classList.contains('listening')) { // Only reset if not thinking
+            // Only reset to idle if it's not currently in 'thinking' or 'speaking' state
+            if (!this.button.classList.contains('thinking') && !this.button.classList.contains('speaking')) {
                 this.setState('idle');
             }
         };
 
         this.recognition.onresult = (event) => {
             const userQuery = event.results[0][0].transcript;
-            console.log(`User said: ${userQuery}`);
             this.setState('thinking');
-
-            // Stop listening immediately after getting a result
-            this.recognition.stop();
-            
             this.sendToBackend(userQuery);
         };
+        
+        // Handle errors gracefully
+        this.recognition.onerror = (event) => {
+            console.error("Speech Recognition Error:", event.error);
+            this.isListening = false;
+            this.setState('idle');
+        }
     }
 
     toggleListening() {
+        if (window.speechSynthesis.speaking) {
+            // Stop the assistant from speaking if the button is clicked
+            window.speechSynthesis.cancel();
+            this.setState('idle');
+            return;
+        }
+
         if (this.isListening) {
             this.recognition.stop();
         } else {
@@ -95,8 +115,8 @@ class C2CAIAssistant {
     }
 
     setState(state) {
-        this.button.classList.remove('listening', 'thinking');
-        if (state === 'listening' || state === 'thinking') {
+        this.button.className = 'c2cai-button'; // Reset classes
+        if (state === 'listening' || state === 'thinking' || state === 'speaking') {
             this.button.classList.add(state);
         }
     }
@@ -125,6 +145,9 @@ class C2CAIAssistant {
     }
 
     speak(text) {
+        // Stop any previous speech
+        window.speechSynthesis.cancel();
+        
         this.setState('speaking');
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = this.config.language;
@@ -133,7 +156,29 @@ class C2CAIAssistant {
         };
         window.speechSynthesis.speak(utterance);
     }
-}
+    
+    // **** THIS IS NOW A SEPARATE METHOD OF THE CLASS ****
+    greetUser() {
+        const hour = new Date().getHours();
+        let greeting;
+
+        if (hour < 12) {
+            greeting = "Good morning";
+        } else if (hour < 18) {
+            greeting = "Good afternoon";
+        } else {
+            greeting = "Good evening";
+        }
+
+        // Get website name from the <title> tag
+        const siteName = document.title || "this website"; 
+
+        const welcomeText = `${greeting}, welcome to ${siteName}. I am your AI assistant. How can I help you today?`;
+        
+        // Use the existing speak function to say the welcome message
+        this.speak(welcomeText);
+    }
+} // ** <-- THE CLASS ENDS HERE **
 
 // To make it available globally on the window object
 window.C2CAIAssistant = C2CAIAssistant;
