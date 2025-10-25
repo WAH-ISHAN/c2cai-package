@@ -1,11 +1,22 @@
 {
-  "name": "c2cai-package",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "name": "c2cai-package", 
+  "version": "1.0.1",      
+  "description": "A simple, AI-powered voice assistant for any website.",
+  "main": "dist/c2cai.min.js",
+  "module": "src/c2cai.js",
+  "exports": {
+    ".": {
+      "import": "./src/c2cai.js",
+      "require": "./dist/c2cai.min.js"
+    }
   },
-  "author": "",
-  "license": "ISC"
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "terser src/c2cai.js -c -m -o dist/c2cai.min.js"
+  },
+  "author": "W.A.H.ISHAN",
+  "license": "MIT"
 }
