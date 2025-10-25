@@ -1,6 +1,6 @@
 {
   "name": "c2cai-package", 
-  "version": "1.0.1",      
+  "version": "1.0.2",      
   "description": "A simple, AI-powered voice assistant for any website.",
   "main": "dist/c2cai.min.js",
   "module": "src/c2cai.js",
