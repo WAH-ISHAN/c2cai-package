@@ -1,14 +1,4 @@
-නියමයි! හොඳ `README` file එකක් කියන්නේ ඕනෑම open-source project එකක සාර්ථකත්වයට අත්‍යවශ්‍ය දෙයක්. ඒකෙන් අනිත් developerලාට ඔබේ project එක මොකක්ද, ඒක පාවිච්චි කරන්නේ කොහොමද කියලා ලේසියෙන්ම තේරුම් ගන්න පුළුවන් වෙනවා.
 
-මෙන්න ඔබේ `c2cai-package` එකට ගළපෙන, සවිස්තරාත්මක `README.md` file එකක්. මේක Markdown කියන format එකෙන් ලියලා තියෙන්නේ. ඔබට මේ සම්පූර්ණ text එක copy කරලා, ඔබේ `c2cai-project/c2cai-package` folder එක ඇතුළේ `README.md` නමින් අලුත් file එකක් හදලා, ඒකට paste කරන්න පුළුවන්.
-
-ඊට පස්සේ, මේ `README.md` file එකත් එක්ක package එක නැවත publish කළාම (version එක `1.0.3` වගේ වැඩි කරලා), ඔබේ NPM page එක සහ GitHub page එක ගොඩක් ලස්සනට, විස්තරාත්මකව පෙනෙයි.
-
----
-
-### `README.md` (මේ පහළ තියෙන content එක copy කරගන්න)
-
-````markdown
 # C2C-AI Assistant (`c2cai-package`)
 
 [![npm version](https://img.shields.io/npm/v/c2cai-package.svg)](https://www.npmjs.com/package/c2cai-package)
